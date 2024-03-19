@@ -1,25 +1,25 @@
 body {
-    font-family: sans-serif;
+	font-family: sans-serif;
 }
 
 .todos {
-    font-size: 1.5em;
+	font-size: 1.5em;
 }
 
 .todo {
-    list-style-type: '☐ ';
+	list-style-type: '☐ ';
 }
 
 .todo.done {
-    list-style-type: '☑ ';
-    text-decoration: line-through;
+	list-style-type: '☑ ';
+	text-decoration: line-through;
 }
 
 .todo a {
-    color: black;
-    text-decoration: none;
+	color: black;
+	text-decoration: none;
 }
 
 .todo a:hover {
-    color: dimgray;
+	color: dimgray;
 }

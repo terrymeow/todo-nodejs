@@ -1,22 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="/style.css" rel="stylesheet">
-    <title>TODO list</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link href="/style.css" rel="stylesheet">
+	<title>TODO list</title>
 </head>
 <body>
-    <h1>TODO list</h1>
-    <ul class="todos">
-    <% for (const todo of todos) { %>
-        <li class="todo<%= todo.done ? ' done' : '' %>"><a href="/todo/<%= todo.id %>"><%= todo.title %></a></li>
-    <% } %>
-    </ul>
+	<h1>TODO list</h1>
+	<ul class="todos">
+	<% for (const todo of todos) { %>
+		<li class="todo<%= todo.done ? ' done' : '' %>"><a href="/todo/<%= todo.id %>"><%= todo.title %></a></li>
+	<% } %>
+	</ul>
 
-    <form method="POST" action="/add-todo">
-        <input placeholder="Task name" name="title">
-        <button type="submit">Add task</button>
-    </form>
+	<form method="POST" action="/add-todo">
+		<input placeholder="Task name" name="title">
+		<button type="submit">Add task</button>
+	</form>
 </body>
 </html>
