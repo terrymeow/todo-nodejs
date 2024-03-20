@@ -16,5 +16,5 @@ export const up = async (knex) => {
  * @returns { Promise<void> }
  */
 export const down = async (knex) => {
-	await knex.schema.dropTable('toods');
+	await knex.schema.dropTable('todos');
 };
