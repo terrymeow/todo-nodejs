@@ -10,12 +10,17 @@
 	<h1>TODO list</h1>
 	<ul class="todos">
 	<% for (const todo of todos) { %>
-		<li class="todo<%= todo.done ? ' done' : '' %>"><a href="/todo/<%= todo.id %>"><%= todo.title %></a></li>
+		<li class="todo<%= todo.done ? ' done' : '' %> <%= todo.priorityClass %>"><a href="/todo/<%= todo.id %>"><%= todo.title %></a></li>
 	<% } %>
 	</ul>
 
 	<form method="POST" action="/add-todo">
 		<input placeholder="Task name" name="title">
+		<select name="priority">
+			<option value="1">High priority</option>
+			<option value="0" selected>Normal priority</option>
+			<option value="-1">Low priority</option>
+		</select>
 		<button type="submit">Add task</button>
 	</form>
 </body>

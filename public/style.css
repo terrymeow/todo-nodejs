@@ -15,6 +15,21 @@ body {
 	text-decoration: line-through;
 }
 
+.todo.low::before {
+	content: '↓ ';
+	color: green;
+}
+
+.todo.medium::before {
+	content: '= ';
+	color: orange;
+}
+
+.todo.high::before {
+	content: '↑ ';
+	color: red;
+}
+
 .todo a {
 	color: black;
 	text-decoration: none;
