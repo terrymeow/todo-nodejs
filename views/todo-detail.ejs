@@ -7,33 +7,23 @@
 	<title><%= todo.title %> - TODO list</title>
 </head>
 <body>
-	<h1 class="todo<%= todo.done ? ' done' : '' %>"><%= todo.title %></h1>
-	<p>
-		<form method="POST" id="priorityForm" action="/change-priority/<%= todo.id %>"></form>
-			<select name="priority" form="priorityForm" onchange="priorityForm.submit()">
-				<option value="1" <%= todo.priority == 1 ? 'selected' : '' %>>High priority</option>
-				<option value="0" <%= todo.priority == 0 ? 'selected' : '' %>>Normal priority</option>
-				<option value="-1" <%= todo.priority == -1 ? 'selected' : '' %>>Low priority</option>
-			</select>
-		</form>
-	</p>
-	<p>
-		<a href="/remove-todo/<%= todo.id %>">
-			remove
-		</a>
-		&middot;
-		<a href="/toggle-done/<%= todo.id %>">
-			<%= todo.done ? 'mark not done' : 'mark done' %>
-		</a>
-	</p>
-	<p>
-		<form method="POST" action="/rename-todo/<%= todo.id %>">
-			<input placeholder="New name" name="title">
-			<button type="submit">Rename task</button>
-		</form>
-	</p>
+	<div id="todoDetail">
+		<%- include('_todo') %>
+	</div>
 	<p>
 		<a href="/">back to the list</a>
 	</p>
+
+	<script>
+		const ws = new WebSocket('ws://localhost:3000');
+
+		ws.addEventListener('message', (message) => {
+			const payload = JSON.parse(message.data);
+			if (payload.type === '<%= todo.id %>') {
+				document.getElementById('todoDetail').innerHTML = payload.html;
+				document.title = `${payload.todoTitle} - TODO list`;
+			}
+  		});
+	</script>
 </body>
 </html>

@@ -1,34 +1,27 @@
-import express from 'express'
-import knex from 'knex'
-import knexfile from './knexfile.js';
+import express from 'express';
+import { createWebSocketServer, updateTodoForAllConnections } from './src/websockets.js';
+import { getAllTodos, getTodo, insertTodo, updateTodo, deleteTodo } from './src/db.js';
 
 const app = express();
-const db = knex(knexfile);
-
-const priorityClasses = {
-	'-1': 'low',
-	'0': 'medium',
-	'1': 'high',
-};
 
 app.set('view engine', 'ejs');
 
 app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 
-const getTodo = async (req, res, next) => {
-	res.locals.todo = await db('todos').select('*').where('id', req.params.id).first();
+const getTodoMiddleware = async (req, res, next) => {
+	res.locals.todo = await getTodo(req.params.id);
 	if (!res.locals.todo) {
-		return res.status(404).send("This TODO doesn't exist!");
+		return res.status(404).send(`
+			<p><strong>This TODO doesn't exist!</strong></p>
+			<p><a href="/">back to the list</a></p>`
+		);
 	}
 	next();
 };
 
 app.get('/', async (req, res) => {
-	const todos = await db('todos').select('*');
-	todos.map(todo => {
-		todo.priorityClass = priorityClasses[todo.priority];
-	});
+	const todos = await getAllTodos();
 	res.render('todo-list', {
 		todos,
 	});
@@ -43,43 +36,54 @@ app.post('/add-todo', async (req, res) => {
 			done: false,
 			priority: [-1, 0, 1].includes(priority) ? priority : 0,
 		};
-		await db('todos').insert(todo);
+		await insertTodo(todo);
+		updateTodoForAllConnections();
 	}
 	res.redirect(303, '/');
 });
 
-app.get('/todo/:id', getTodo, (req, res) => {
+app.get('/todo/:id', getTodoMiddleware, (req, res) => {
 	res.render('todo-detail', {
 		todo: res.locals.todo,
 	});
 });
 
-app.post('/rename-todo/:id', getTodo, async (req, res) => {
+app.post('/rename-todo/:id', getTodoMiddleware, async (req, res) => {
 	const newTitle = req.body.title.trim();
 	if (newTitle.length > 0) {
-		await db('todos').update({ title: newTitle }).where('id', res.locals.todo.id);
+		const id = res.locals.todo.id;
+		await updateTodo(id, { title: newTitle });
+		updateTodoForAllConnections(id);
 	}
 	res.redirect(303, 'back');
-})
+});
 
-app.post('/change-priority/:id', getTodo, async (req, res) => {
+app.post('/change-priority/:id', getTodoMiddleware, async (req, res) => {
 	const newPriority = Number(req.body.priority);
 	if ([-1, 0, 1].includes(newPriority)) {
-		await db('todos').update({ priority: newPriority }).where('id', res.locals.todo.id);
+		const id = res.locals.todo.id;
+		await updateTodo(id, { priority: newPriority });
+		updateTodoForAllConnections(id);
 	}
 	res.redirect(303, 'back');
-})
+});
 
-app.get('/toggle-done/:id', getTodo, async (req, res) => {
-	await db('todos').update({ done: !res.locals.todo.done }).where('id', res.locals.todo.id);
+app.get('/toggle-done/:id', getTodoMiddleware, async (req, res) => {
+	const id = res.locals.todo.id;
+	await updateTodo(id, { done: !res.locals.todo.done });
+	updateTodoForAllConnections(id);
 	res.redirect(303, 'back');
 });
 
 app.get('/remove-todo/:id', async (req, res) => {
-	await db('todos').where('id', req.params.id).del();
+	const id = req.params.id;
+	await deleteTodo(id);
+	updateTodoForAllConnections(id);
 	res.redirect(303, '/');
 });
 
-app.listen(3000, () => {
+const server = app.listen(3000, () => {
 	console.log("Server listening");
 });
+
+createWebSocketServer(server);

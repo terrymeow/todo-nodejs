@@ -1,0 +1,12 @@
+<%
+const priorityClasses = {
+	'-1': 'low',
+	'0': 'medium',
+	'1': 'high',
+};
+%>
+<ul class="todos">
+<% for (const todo of todos) { %>
+	<li class="todo<%= todo.done ? ' done' : '' %> <%= priorityClasses[todo.priority] %>"><a href="/todo/<%= todo.id %>"><%= todo.title %></a></li>
+<% } %>
+</ul>
