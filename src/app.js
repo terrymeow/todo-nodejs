@@ -1,8 +1,8 @@
 import express from 'express';
-import { createWebSocketServer, updateTodoForAllConnections } from './src/websockets.js';
-import { getAllTodos, getTodo, insertTodo, updateTodo, deleteTodo } from './src/db.js';
+import { updateTodoForAllConnections } from './websockets.js';
+import { getAllTodos, getTodo, insertTodo, updateTodo, deleteTodo } from './db.js';
 
-const app = express();
+export const app = express();
 
 app.set('view engine', 'ejs');
 
@@ -81,9 +81,3 @@ app.get('/remove-todo/:id', async (req, res) => {
 	updateTodoForAllConnections(id);
 	res.redirect(303, '/');
 });
-
-const server = app.listen(3000, () => {
-	console.log("Server listening");
-});
-
-createWebSocketServer(server);
